@@ -1,7 +1,7 @@
 .square{
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; 
+    justify-content: center; 
     align-items: center;
     width: 80px;
     height: 80px;

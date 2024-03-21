@@ -1,9 +1,9 @@
 import Piece from "./Piece";
 
 export const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
-export const verticalAxis = [8, 7, 6, 5, 4, 3, 2, 1];
+export const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 
-export const getPieces = () => {
+export const getInitialPieceState = () => {
   const pieces = [];
   fillPawns(pieces);
   fillRooks(pieces);
