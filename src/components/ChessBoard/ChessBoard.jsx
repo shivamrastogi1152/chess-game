@@ -2,6 +2,7 @@ import './ChessBoard.css'
 import Square from '../Square/Square';
 import { horizontalAxis, verticalAxis, getInitialPieceState } from '../../utils/utils';
 import { useRef, useState } from 'react';
+import Referee from '../../Referee/Referee';
 
 const generateBoard = (pieces)=>{
     let board = [];
@@ -18,10 +19,10 @@ const generateBoard = (pieces)=>{
 
             board.push(
                 <Square 
-                    row={i} 
-                    col={j} 
+                    row={j} 
+                    col={i} 
                     imgSrc={imgSrc} 
-                    key={horizontalAxis[j]+verticalAxis[i]}
+                    key={horizontalAxis[i]+verticalAxis[j]}
                 />
             );
         }
@@ -36,12 +37,13 @@ function ChessBoard(){
     const [activePiece, setActivePiece] = useState(null);
     const [pieces, setPieces] = useState(getInitialPieceState());
     let board = generateBoard(pieces);
-    const chessBoardRef = useRef(null);
+    const chessBoardReference = useRef(null);
+    const referee = new Referee();
 
     const grabPiece = (e) => {
         const element = e.target;
         // console.log(element);
-        const chessBoard = chessBoardRef.current;
+        const chessBoard = chessBoardReference.current;
         if(element.classList.contains('chess-piece')){
 
             setGridX(Math.floor((e.clientX-chessBoard.offsetLeft)/80));
@@ -59,7 +61,7 @@ function ChessBoard(){
     
     const movePiece = (e)=>{
         // console.log(activePiece);
-        const chessBoard = chessBoardRef.current;
+        const chessBoard = chessBoardReference.current;
         if(activePiece && chessBoard){
 
             const minX = chessBoard.offsetLeft-15;
@@ -77,7 +79,7 @@ function ChessBoard(){
     }
     
     const dropPiece = (e)=>{
-        const chessBoard = chessBoardRef.current;
+        const chessBoard = chessBoardReference.current;
         if(activePiece){
  
             const x = Math.floor((e.clientX-chessBoard.offsetLeft)/80);
@@ -86,8 +88,12 @@ function ChessBoard(){
             setPieces((val)=> {
                 const temp = val.map((p)=>{
                     if(p.x === gridX && p.y === gridY){
-                        p.x = Math.floor((e.clientX-chessBoard.offsetLeft)/80);
-                        p.y = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-640)/80));
+
+                        if(referee.isValidMove(gridX, gridY, x, y, p.pieceType, p.team)){
+                            p.x = x;
+                            p.y = y;
+                        }
+                        
                     }
                     return p;
                 })
@@ -104,7 +110,7 @@ function ChessBoard(){
         onMouseMove={e => movePiece(e)} 
         onMouseUp={e => dropPiece(e)} 
         id="chessBoard"
-        ref={chessBoardRef}>
+        ref={chessBoardReference}>
             {board}
         </div>
     )

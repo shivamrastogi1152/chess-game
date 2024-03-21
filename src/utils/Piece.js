@@ -1,9 +1,10 @@
 class Piece {
-  constructor(x, y, imgSrc, type) {
+  constructor(x, y, imgSrc, pieceType, team) {
     this.x = x;
     this.y = y;
     this.imgSrc = imgSrc;
-    this.type = type;
+    this.pieceType = pieceType;
+    this.team = team;
   }
 }
 
