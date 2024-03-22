@@ -20,9 +20,9 @@ export const getInitialPieceState = () => {
 const fillPawns = (pieces) => {
   for (let x = 0; x < 8; x++) {
     for (let c = 0; c < 2; c++) {
-      const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+      const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
       const color = team === TeamType.BLACK ? "b" : "w";
-      const y = team === TeamType.BLACK ? 1 : 6;
+      const y = team === TeamType.WHITE ? 1 : 6;
       pieces.push(
         new Piece(x, y, `assets/images/pawn_${color}.png`, PieceType.PAWN, team)
       );
@@ -32,9 +32,9 @@ const fillPawns = (pieces) => {
 
 const fillRooks = (pieces) => {
   for (let c = 0; c < 2; c++) {
-    const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+    const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
     const color = team === TeamType.BLACK ? "b" : "w";
-    const y = team === TeamType.BLACK ? 0 : 7;
+    const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
       new Piece(0, y, `assets/images/rook_${color}.png`, PieceType.ROOK, team)
     );
@@ -46,9 +46,9 @@ const fillRooks = (pieces) => {
 
 const fillKnights = (pieces) => {
   for (let c = 0; c < 2; c++) {
-    const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+    const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
     const color = team === TeamType.BLACK ? "b" : "w";
-    const y = team === TeamType.BLACK ? 0 : 7;
+    const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
       new Piece(
         1,
@@ -72,9 +72,9 @@ const fillKnights = (pieces) => {
 
 const fillBishops = (pieces) => {
   for (let c = 0; c < 2; c++) {
-    const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+    const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
     const color = team === TeamType.BLACK ? "b" : "w";
-    const y = team === TeamType.BLACK ? 0 : 7;
+    const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
       new Piece(
         2,
@@ -98,9 +98,9 @@ const fillBishops = (pieces) => {
 
 const fillQueens = (pieces) => {
   for (let c = 0; c < 2; c++) {
-    const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+    const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
     const color = team === TeamType.BLACK ? "b" : "w";
-    const y = team === TeamType.BLACK ? 0 : 7;
+    const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
       new Piece(3, y, `assets/images/queen_${color}.png`, PieceType.QUEEN, team)
     );
@@ -109,9 +109,9 @@ const fillQueens = (pieces) => {
 
 const fillKings = (pieces) => {
   for (let c = 0; c < 2; c++) {
-    const team = c === 0 ? TeamType.BLACK : TeamType.WHITE;
+    const team = c === 0 ? TeamType.WHITE : TeamType.BLACK;
     const color = team === TeamType.BLACK ? "b" : "w";
-    const y = team === TeamType.BLACK ? 0 : 7;
+    const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
       new Piece(4, y, `assets/images/king_${color}.png`, PieceType.KING, team)
     );

@@ -1,8 +1,10 @@
 import './ChessBoard.css'
-import Square from '../Square/Square';
-import { horizontalAxis, verticalAxis, getInitialPieceState } from '../../utils/utils';
 import { useRef, useState } from 'react';
+import Square from '../Square/Square';
 import Referee from '../../Referee/Referee';
+import { horizontalAxis, verticalAxis, getInitialPieceState } from '../../utils/utils';
+import PieceType from "../../utils/PieceType"
+import TeamType from "../../utils/TeamType"
 
 const generateBoard = (pieces)=>{
     let board = [];
@@ -85,20 +87,73 @@ function ChessBoard(){
             const x = Math.floor((e.clientX-chessBoard.offsetLeft)/80);
             const y = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-640)/80));
 
-            setPieces((val)=> {
-                const temp = val.map((p)=>{
-                    if(p.x === gridX && p.y === gridY){
+            const currentPiece = pieces.find(piece => piece.x === gridX && piece.y === gridY);
+            // console.log(`Current piece is: `, currentPiece);
+            const attackedPiece = pieces.find(piece => piece.x === x && piece.y === y);
+            // console.log(`Attacked piece is: `, attackedPiece);
 
-                        if(referee.isValidMove(gridX, gridY, x, y, p.pieceType, p.team)){
+            if(currentPiece){
+
+                
+                const enPassantMove = referee.isEnPassantMove(gridX, gridY, x, y, currentPiece.pieceType, currentPiece.team, pieces);
+
+                if(enPassantMove){
+                    const dirY = currentPiece.team === TeamType.WHITE ? 1 : -1;
+                    const updatedPieces = pieces.reduce((result, p)=>{
+
+                        if(p.x === gridX && p.y === gridY){
+                            p.enPassant = false;
                             p.x = x;
                             p.y = y;
+                            result.push(p);
+                        }else if( !(p.x === x && p.y === y - dirY) ){
+                            if(p.pieceType === PieceType.PAWN){
+                                p.enPassant = false;
+                            }
+                            result.push(p);
                         }
-                        
-                    }
-                    return p;
-                })
-                return temp;
-            });
+                        return result;
+                    }, []);
+                    setPieces(updatedPieces);
+                }
+
+                // isValidMove() handles:
+                // 1. PieceType movement logic
+                // 2. PieceType attacking logic (Check if attacking square is occupied by opponent as well)
+                 //In case of a valid move update the pieces state accordingly
+                else if(referee.isValidMove(currentPiece.x, currentPiece.y, x, y, currentPiece.pieceType, currentPiece.team, pieces)){
+                    const updatedPieces = pieces.reduce((result, p)=>{
+                        //Update current piece's position to new position
+                        if(p.x === gridX && p.y === gridY){
+
+                            if(p.pieceType === PieceType.PAWN && Math.abs(gridY - y)===2){
+                                p.enPassant = true;
+                            }else{ 
+                                p.enPassant = false;
+                            }
+
+                            p.x = x;
+                            p.y = y;
+                            result.push(p);
+                        } 
+                        //Include non-attacked pieces in the result
+                        else if( !(p.x === x && p.y === y) ){
+                            if(p.pieceType === PieceType.PAWN){
+                                p.enPassant = false;
+                            }
+                            result.push(p);
+                        }
+                        return result;
+                    }, []);
+                    setPieces(updatedPieces);
+                }
+                // Not a valid move -> return the piece back to original position
+                else{
+                    activePiece.style.position = "relative";
+                    activePiece.style.left = '0px';
+                    activePiece.style.top = '0px';
+                }
+            }
 
             setActivePiece(null);
         }
@@ -110,7 +165,8 @@ function ChessBoard(){
         onMouseMove={e => movePiece(e)} 
         onMouseUp={e => dropPiece(e)} 
         id="chessBoard"
-        ref={chessBoardReference}>
+        ref={chessBoardReference}
+        >
             {board}
         </div>
     )
