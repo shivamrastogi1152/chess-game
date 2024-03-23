@@ -60,8 +60,7 @@ class Referee {
       return true;
     }
 
-    //Pawn Attack
-    //Basic Attack Logic
+    //Pawn Attack (En passant is handled separately)
     if (
       Math.abs(fromX - toX) === 1 &&
       toY - fromY === dirY &&
@@ -73,14 +72,36 @@ class Referee {
     return false;
   }
 
+  isValidKnightMove(fromX, fromY, toX, toY, team, pieceState) {
+    if (
+      (Math.abs(toX - fromX) === 2 && Math.abs(toY - fromY) === 1) ||
+      (Math.abs(toX - fromX) === 1 && Math.abs(toY - fromY) === 2)
+    ) {
+      return (
+        !this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+      );
+    }
+    return false;
+  }
+
   isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
     // console.log(
     //   `Moving ${team} ${pieceType} from (${fromX}, ${fromY}) to (${toX}, ${toY})`
     // );
 
-    if (pieceType === PieceType.PAWN) {
-      if (this.isValidPawnMove(fromX, fromY, toX, toY, team, pieceState))
-        return true;
+    if (
+      pieceType === PieceType.PAWN &&
+      this.isValidPawnMove(fromX, fromY, toX, toY, team, pieceState)
+    ) {
+      return true;
+    }
+
+    if (
+      pieceType === PieceType.KNIGHT &&
+      this.isValidKnightMove(fromX, fromY, toX, toY, team, pieceState)
+    ) {
+      return true;
     }
 
     // console.log(
