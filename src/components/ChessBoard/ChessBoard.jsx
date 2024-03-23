@@ -52,6 +52,7 @@ function ChessBoard(){
             element.style.position = 'absolute';
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
+            element.style.zIndex = `100`;
             setActivePiece(element);
 
         }
@@ -130,6 +131,7 @@ function ChessBoard(){
                     activePiece.style.position = "relative";
                     activePiece.style.left = '0px';
                     activePiece.style.top = '0px';
+                    activePiece.style.zIndex = `0`;
                 }
             }
             setActivePiece(null);

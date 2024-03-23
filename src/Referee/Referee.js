@@ -3,19 +3,19 @@ import PieceType from "../utils/PieceType";
 import TeamType from "../utils/TeamType";
 
 class Referee {
+  getPieceAtSquare(x, y, pieceState) {
+    const piece = pieceState.find((p) => p.x === x && p.y === y);
+    return piece;
+  }
+
   isSquareOccupied(toX, toY, pieceState) {
-    const piece = pieceState.find((p) => {
-      if (p.x === toX && p.y === toY) return true;
-    });
+    const piece = this.getPieceAtSquare(toX, toY, pieceState);
     return piece != null;
   }
 
   isSquareOccupiedByOpponent(toX, toY, pieceState, team) {
-    const piece = pieceState.find((p) => {
-      if (p.x === toX && p.y === toY && p.team != team) return true;
-    });
-    // console.log(piece);
-    return piece != null;
+    const piece = this.getPieceAtSquare(toX, toY, pieceState);
+    return piece != null && piece.team != team;
   }
 
   isEnPassantMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
@@ -85,25 +85,130 @@ class Referee {
     return false;
   }
 
+  isValidBishopMove(fromX, fromY, toX, toY, team, pieceState) {
+    const deltaX = Math.abs(toX - fromX);
+    const deltaY = Math.abs(toY - fromY);
+    const maxSteps = deltaX;
+
+    // Diagonal Movement Check
+    if (deltaX === deltaY) {
+      const dirX = Math.sign(toX - fromX);
+      const dirY = Math.sign(toY - fromY);
+
+      for (let step = 1; step < maxSteps; step++) {
+        const nextX = fromX + dirX * step;
+        const nextY = fromY + dirY * step;
+
+        // Check if any square between from and to is occupied
+        if (this.isSquareOccupied(nextX, nextY, pieceState)) {
+          // Obstruction found -> invalid move
+          return false;
+        }
+      }
+
+      // Check if the destination square is unoccupied or occupied by an opponent's piece
+      return (
+        !this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+      );
+    }
+
+    return false;
+  }
+
+  isValidRookMove(fromX, fromY, toX, toY, team, pieceState) {
+    const deltaX = Math.abs(toX - fromX);
+    const deltaY = Math.abs(toY - fromY);
+
+    // Check if the move is either purely horizontal or purely vertical
+    if ((deltaX === 0 && deltaY !== 0) || (deltaX !== 0 && deltaY === 0)) {
+      const dirX = Math.sign(toX - fromX);
+      const dirY = Math.sign(toY - fromY);
+      const maxSteps = Math.max(deltaX, deltaY);
+
+      for (let step = 1; step < maxSteps; step++) {
+        const nextX = fromX + dirX * step;
+        const nextY = fromY + dirY * step;
+
+        // Check if any square between from and to is occupied
+        if (this.isSquareOccupied(nextX, nextY, pieceState)) {
+          // Obstruction found -> invalid move
+          return false;
+        }
+      }
+
+      // Check if the destination square is unoccupied or occupied by an opponent's piece
+      return (
+        !this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+      );
+    }
+
+    return false;
+  }
+
+  isValidQueenMove(fromX, fromY, toX, toY, team, pieceState) {
+    const deltaX = Math.abs(toX - fromX);
+    const deltaY = Math.abs(toY - fromY);
+    const dirX = Math.sign(toX - fromX);
+    const dirY = Math.sign(toY - fromY);
+    const maxSteps = Math.max(deltaX, deltaY);
+
+    // Diagonal Movement Check
+    if (deltaX === deltaY) {
+      for (let step = 1; step < maxSteps; step++) {
+        const nextX = fromX + dirX * step;
+        const nextY = fromY + dirY * step;
+
+        // Check if any square between from and to is occupied
+        if (this.isSquareOccupied(nextX, nextY, pieceState)) {
+          // Obstruction found -> invalid move
+          return false;
+        }
+      }
+
+      // Check if the destination square is unoccupied or occupied by an opponent's piece
+      return (
+        !this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+      );
+    }
+    // Check if the move is either purely horizontal or purely vertical
+    else if ((deltaX === 0 && deltaY !== 0) || (deltaX !== 0 && deltaY === 0)) {
+      for (let step = 1; step < maxSteps; step++) {
+        const nextX = fromX + dirX * step;
+        const nextY = fromY + dirY * step;
+
+        // Check if any square between from and to is occupied
+        if (this.isSquareOccupied(nextX, nextY, pieceState)) {
+          // Obstruction found -> invalid move
+          return false;
+        }
+      }
+      // Check if the destination square is unoccupied or occupied by an opponent's piece
+      return (
+        !this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+      );
+    }
+    //Neither Diagonal nor Horizontal/Vertical movement -> invalid move
+    return false;
+  }
+
   isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
     // console.log(
     //   `Moving ${team} ${pieceType} from (${fromX}, ${fromY}) to (${toX}, ${toY})`
     // );
-
-    if (
-      pieceType === PieceType.PAWN &&
-      this.isValidPawnMove(fromX, fromY, toX, toY, team, pieceState)
-    ) {
-      return true;
-    }
-
-    if (
-      pieceType === PieceType.KNIGHT &&
-      this.isValidKnightMove(fromX, fromY, toX, toY, team, pieceState)
-    ) {
-      return true;
-    }
-
+    if (pieceType === PieceType.PAWN)
+      return this.isValidPawnMove(fromX, fromY, toX, toY, team, pieceState);
+    else if (pieceType === PieceType.KNIGHT)
+      return this.isValidKnightMove(fromX, fromY, toX, toY, team, pieceState);
+    else if (pieceType === PieceType.BISHOP)
+      return this.isValidBishopMove(fromX, fromY, toX, toY, team, pieceState);
+    else if (pieceType === PieceType.ROOK)
+      return this.isValidRookMove(fromX, fromY, toX, toY, team, pieceState);
+    else if (pieceType === PieceType.QUEEN)
+      return this.isValidQueenMove(fromX, fromY, toX, toY, team, pieceState);
     // console.log(
     //   `${team} ${pieceType} can't be moved from (${fromX},${fromY}) to (${toX},${toY})`
     // );
