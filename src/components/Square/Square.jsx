@@ -1,5 +1,5 @@
 import './Square.css'
-import { horizontalAxis, verticalAxis } from '../../utils/utils';
+import { HORIZONTAL_AXIS, VERTICAL_AXIS } from '../../utils/utils';
 
 function Square({row, col, imgSrc}){
     return (

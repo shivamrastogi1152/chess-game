@@ -2,8 +2,11 @@ import Piece from "./Piece";
 import PieceType from "./PieceType";
 import TeamType from "./TeamType";
 
-export const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
-export const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
+export const HORIZONTAL_AXIS = ["a", "b", "c", "d", "e", "f", "g", "h"];
+export const VERTICAL_AXIS = [1, 2, 3, 4, 5, 6, 7, 8];
+export const BOARD_LENGTH = 640;
+export const SQUARE_LENGTH = 80;
+export const OFFSET = 10;
 
 export const getInitialPieceState = () => {
   const pieces = [];

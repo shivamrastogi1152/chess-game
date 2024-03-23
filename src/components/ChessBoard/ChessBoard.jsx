@@ -2,29 +2,25 @@ import './ChessBoard.css'
 import { useRef, useState } from 'react';
 import Square from '../Square/Square';
 import Referee from '../../Referee/Referee';
-import { horizontalAxis, verticalAxis, getInitialPieceState } from '../../utils/utils';
+import { HORIZONTAL_AXIS, VERTICAL_AXIS, SQUARE_LENGTH, BOARD_LENGTH, OFFSET, getInitialPieceState } from '../../utils/utils';
 import PieceType from "../../utils/PieceType"
 import TeamType from "../../utils/TeamType"
 
 const generateBoard = (pieces)=>{
     let board = [];
 
-    for(let j=verticalAxis.length-1;j>=0;j--){
-        for(let i=0;i<horizontalAxis.length;i++){
+    for(let j=VERTICAL_AXIS.length-1;j>=0;j--){
+        for(let i=0;i<HORIZONTAL_AXIS.length;i++){
 
-            let imgSrc = null;              
-            pieces.forEach(piece =>{
-                if(piece.x === i && piece.y === j){
-                    imgSrc = piece.imgSrc;
-                }
-            })
+            const piece = pieces.find(p => p.x === i && p.y === j);
+            const imgSrc = piece ? piece.imgSrc : null;              
 
             board.push(
                 <Square 
                     row={j} 
                     col={i} 
                     imgSrc={imgSrc} 
-                    key={horizontalAxis[i]+verticalAxis[j]}
+                    key={HORIZONTAL_AXIS[i]+VERTICAL_AXIS[j]}
                 />
             );
         }
@@ -48,11 +44,11 @@ function ChessBoard(){
         const chessBoard = chessBoardReference.current;
         if(element.classList.contains('chess-piece')){
 
-            setGridX(Math.floor((e.clientX-chessBoard.offsetLeft)/80));
-            setGridY(Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-640)/80)));
+            setGridX(Math.floor((e.clientX-chessBoard.offsetLeft)/SQUARE_LENGTH));
+            setGridY(Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-BOARD_LENGTH)/SQUARE_LENGTH)));
 
-            const x = e.clientX-30; //x offset will be width/2
-            const y = e.clientY-30; //y offset will be height/2
+            const x = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
+            const y = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
             element.style.position = 'absolute';
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
@@ -66,13 +62,13 @@ function ChessBoard(){
         const chessBoard = chessBoardReference.current;
         if(activePiece && chessBoard){
 
-            const minX = chessBoard.offsetLeft-15;
-            const minY = chessBoard.offsetTop-10;
-            const maxX = minX + chessBoard.clientWidth-35;
-            const maxY = minY + chessBoard.clientHeight-40;
+            const minX = chessBoard.offsetLeft-OFFSET;
+            const minY = chessBoard.offsetTop-OFFSET;
+            const maxX = minX + chessBoard.clientWidth-(SQUARE_LENGTH/2);
+            const maxY = minY + chessBoard.clientHeight-(SQUARE_LENGTH/2);
 
-            const x = e.clientX-30; //x offset will be width/2
-            const y = e.clientY-30; //y offset will be height/2
+            const x = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
+            const y = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
             activePiece.style.position = 'absolute';
             activePiece.style.left = x < minX ? `${minX}px` : x > maxX ? `${maxX}px` : `${x}px`;
             activePiece.style.top = y < minY ? `${minY}px` : y > maxY ? `${maxY}px` : `${y}px`;
@@ -84,63 +80,45 @@ function ChessBoard(){
         const chessBoard = chessBoardReference.current;
         if(activePiece){
  
-            const x = Math.floor((e.clientX-chessBoard.offsetLeft)/80);
-            const y = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-640)/80));
+            const x = Math.floor((e.clientX-chessBoard.offsetLeft)/SQUARE_LENGTH);
+            const y = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-BOARD_LENGTH)/SQUARE_LENGTH));
 
             const currentPiece = pieces.find(piece => piece.x === gridX && piece.y === gridY);
             // console.log(`Current piece is: `, currentPiece);
-            const attackedPiece = pieces.find(piece => piece.x === x && piece.y === y);
-            // console.log(`Attacked piece is: `, attackedPiece);
 
             if(currentPiece){
-
-                
-                const enPassantMove = referee.isEnPassantMove(gridX, gridY, x, y, currentPiece.pieceType, currentPiece.team, pieces);
-
-                if(enPassantMove){
+                if(referee.isEnPassantMove(gridX, gridY, x, y, currentPiece.pieceType, currentPiece.team, pieces)){
                     const dirY = currentPiece.team === TeamType.WHITE ? 1 : -1;
                     const updatedPieces = pieces.reduce((result, p)=>{
-
                         if(p.x === gridX && p.y === gridY){
                             p.enPassant = false;
                             p.x = x;
                             p.y = y;
                             result.push(p);
                         }else if( !(p.x === x && p.y === y - dirY) ){
-                            if(p.pieceType === PieceType.PAWN){
-                                p.enPassant = false;
-                            }
+                            p.enPassant = false;
                             result.push(p);
                         }
                         return result;
                     }, []);
                     setPieces(updatedPieces);
                 }
-
                 // isValidMove() handles:
                 // 1. PieceType movement logic
-                // 2. PieceType attacking logic (Check if attacking square is occupied by opponent as well)
+                // 2. PieceType attacking logic
                  //In case of a valid move update the pieces state accordingly
                 else if(referee.isValidMove(currentPiece.x, currentPiece.y, x, y, currentPiece.pieceType, currentPiece.team, pieces)){
                     const updatedPieces = pieces.reduce((result, p)=>{
                         //Update current piece's position to new position
                         if(p.x === gridX && p.y === gridY){
-
-                            if(p.pieceType === PieceType.PAWN && Math.abs(gridY - y)===2){
-                                p.enPassant = true;
-                            }else{ 
-                                p.enPassant = false;
-                            }
-
+                            p.enPassant = (p.pieceType === PieceType.PAWN && Math.abs(Math.abs(gridY - y)===2));
                             p.x = x;
                             p.y = y;
                             result.push(p);
                         } 
-                        //Include non-attacked pieces in the result
+                        //Include only non-attacked pieces in the result
                         else if( !(p.x === x && p.y === y) ){
-                            if(p.pieceType === PieceType.PAWN){
-                                p.enPassant = false;
-                            }
+                            p.enPassant = false;
                             result.push(p);
                         }
                         return result;
@@ -154,7 +132,6 @@ function ChessBoard(){
                     activePiece.style.top = '0px';
                 }
             }
-
             setActivePiece(null);
         }
     }

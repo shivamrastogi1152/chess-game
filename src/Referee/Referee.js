@@ -21,22 +21,19 @@ class Referee {
   isEnPassantMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
     const dirY = team === TeamType.WHITE ? 1 : -1;
 
-    //If attacking piece is a pawn - DONE
-    //toX,toY should be such that it's upper/bottom left || upper/bottom right compared to fromX,fromY - DONE
-    //if a pawn is present under/above the attacked tile -
-    //if the attacked pawn has moved two units in the previous turn
-
-    if (pieceType === PieceType.PAWN) {
-      if (Math.abs(fromX - toX) === 1 && toY - fromY === dirY) {
-        const piece = pieceState.find(
-          (p) =>
-            p.x === toX &&
-            p.y === toY - dirY &&
-            p.pieceType === PieceType.PAWN &&
-            p.enPassant
-        );
-        if (piece) return true;
-      }
+    if (
+      pieceType === PieceType.PAWN &&
+      Math.abs(fromX - toX) === 1 &&
+      toY - fromY === dirY
+    ) {
+      const piece = pieceState.find(
+        (p) =>
+          p.x === toX &&
+          p.y === toY - dirY &&
+          p.pieceType === PieceType.PAWN &&
+          p.enPassant
+      );
+      if (piece) return true;
     }
 
     return false;
@@ -65,14 +62,12 @@ class Referee {
 
     //Pawn Attack
     //Basic Attack Logic
-    if (fromX - toX === 1 && toY - fromY === dirY) {
-      if (this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)) {
-        return true;
-      }
-    } else if (fromX - toX === -1 && toY - fromY === dirY) {
-      if (this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)) {
-        return true;
-      }
+    if (
+      Math.abs(fromX - toX) === 1 &&
+      toY - fromY === dirY &&
+      this.isSquareOccupiedByOpponent(toX, toY, pieceState, team)
+    ) {
+      return true;
     }
 
     return false;
