@@ -195,6 +195,19 @@ class Referee {
     return false;
   }
 
+  isValidKingMove(fromX, fromY, toX, toY, team, pieceState) {
+    const deltaX = Math.abs(toX - fromX);
+    const deltaY = Math.abs(toY - fromY);
+
+    // TO DO: Check if king is moving into danger
+    return (
+      deltaX <= 1 &&
+      deltaY <= 1 &&
+      (!this.isSquareOccupied(toX, toY, pieceState) ||
+        this.isSquareOccupiedByOpponent(toX, toY, pieceState, team))
+    );
+  }
+
   isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
     // console.log(
     //   `Moving ${team} ${pieceType} from (${fromX}, ${fromY}) to (${toX}, ${toY})`
@@ -209,6 +222,8 @@ class Referee {
       return this.isValidRookMove(fromX, fromY, toX, toY, team, pieceState);
     else if (pieceType === PieceType.QUEEN)
       return this.isValidQueenMove(fromX, fromY, toX, toY, team, pieceState);
+    else if (pieceType === PieceType.KING)
+      return this.isValidKingMove(fromX, fromY, toX, toY, team, pieceState);
     // console.log(
     //   `${team} ${pieceType} can't be moved from (${fromX},${fromY}) to (${toX},${toY})`
     // );
