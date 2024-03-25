@@ -1,7 +1,7 @@
 .square{
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: flex-end; 
     align-items: center;
     width: 80px;
     height: 80px;
@@ -22,6 +22,10 @@
     font-size: x-small;
     user-select: none;
     z-index: 2;
+    opacity: 0.5;
+    align-self: flex-start;
+    padding-left: 2px;
+    padding-bottom: 2px;
 }
 
 .chess-piece{
@@ -30,7 +34,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: 60px;
-    z-index: 1;
+    /* z-index: 1; */
 }
 
 .chess-piece:hover{
@@ -41,5 +45,13 @@
     cursor: grabbing;
 }
 
+.highlight::before{
+    content: " ";
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    background-color: black;  
+    opacity: 0.2;
+}
 
 

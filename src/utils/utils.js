@@ -7,6 +7,7 @@ export const VERTICAL_AXIS = [1, 2, 3, 4, 5, 6, 7, 8];
 export const BOARD_LENGTH = 640;
 export const SQUARE_LENGTH = 80;
 export const OFFSET = 10;
+export const IMG_URL = "/assets/images";
 
 export const getInitialPieceState = () => {
   const pieces = [];
@@ -27,7 +28,13 @@ const fillPawns = (pieces) => {
       const color = team === TeamType.BLACK ? "b" : "w";
       const y = team === TeamType.WHITE ? 1 : 6;
       pieces.push(
-        new Piece(x, y, `assets/images/pawn_${color}.png`, PieceType.PAWN, team)
+        new Piece(
+          x,
+          y,
+          `${IMG_URL}/${PieceType.PAWN.toLowerCase()}_${color}.png`,
+          PieceType.PAWN,
+          team
+        )
       );
     }
   }
@@ -39,10 +46,22 @@ const fillRooks = (pieces) => {
     const color = team === TeamType.BLACK ? "b" : "w";
     const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
-      new Piece(0, y, `assets/images/rook_${color}.png`, PieceType.ROOK, team)
+      new Piece(
+        0,
+        y,
+        `${IMG_URL}/${PieceType.ROOK.toLowerCase()}_${color}.png`,
+        PieceType.ROOK,
+        team
+      )
     );
     pieces.push(
-      new Piece(7, y, `assets/images/rook_${color}.png`, PieceType.ROOK, team)
+      new Piece(
+        7,
+        y,
+        `${IMG_URL}/${PieceType.ROOK.toLowerCase()}_${color}.png`,
+        PieceType.ROOK,
+        team
+      )
     );
   }
 };
@@ -56,7 +75,7 @@ const fillKnights = (pieces) => {
       new Piece(
         1,
         y,
-        `assets/images/knight_${color}.png`,
+        `${IMG_URL}/${PieceType.KNIGHT.toLowerCase()}_${color}.png`,
         PieceType.KNIGHT,
         team
       )
@@ -65,7 +84,7 @@ const fillKnights = (pieces) => {
       new Piece(
         6,
         y,
-        `assets/images/knight_${color}.png`,
+        `${IMG_URL}/${PieceType.KNIGHT.toLowerCase()}_${color}.png`,
         PieceType.KNIGHT,
         team
       )
@@ -82,7 +101,7 @@ const fillBishops = (pieces) => {
       new Piece(
         2,
         y,
-        `assets/images/bishop_${color}.png`,
+        `${IMG_URL}/${PieceType.BISHOP.toLowerCase()}_${color}.png`,
         PieceType.BISHOP,
         team
       )
@@ -91,7 +110,7 @@ const fillBishops = (pieces) => {
       new Piece(
         5,
         y,
-        `assets/images/bishop_${color}.png`,
+        `${IMG_URL}/${PieceType.BISHOP.toLowerCase()}_${color}.png`,
         PieceType.BISHOP,
         team
       )
@@ -105,7 +124,13 @@ const fillQueens = (pieces) => {
     const color = team === TeamType.BLACK ? "b" : "w";
     const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
-      new Piece(3, y, `assets/images/queen_${color}.png`, PieceType.QUEEN, team)
+      new Piece(
+        3,
+        y,
+        `${IMG_URL}/${PieceType.QUEEN.toLowerCase()}_${color}.png`,
+        PieceType.QUEEN,
+        team
+      )
     );
   }
 };
@@ -116,7 +141,13 @@ const fillKings = (pieces) => {
     const color = team === TeamType.BLACK ? "b" : "w";
     const y = team === TeamType.WHITE ? 0 : 7;
     pieces.push(
-      new Piece(4, y, `assets/images/king_${color}.png`, PieceType.KING, team)
+      new Piece(
+        4,
+        y,
+        `${IMG_URL}/${PieceType.KING.toLowerCase()}_${color}.png`,
+        PieceType.KING,
+        team
+      )
     );
   }
 };

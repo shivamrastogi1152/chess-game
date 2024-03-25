@@ -5,6 +5,7 @@ import {
   isValidKingMove,
   isValidKnightMove,
   isValidPawnMove,
+  addPossibleMovesForPawn,
   isValidQueenMove,
   isValidRookMove,
 } from "./rules";
@@ -51,6 +52,11 @@ class Referee {
     //   `${team} ${pieceType} can't be moved from (${fromX},${fromY}) to (${toX},${toY})`
     // );
     return false;
+  }
+
+  addPossibleMoves(currentPiece, pieceState) {
+    if (currentPiece.pieceType === PieceType.PAWN)
+      return addPossibleMovesForPawn(currentPiece, pieceState);
   }
 }
 

@@ -2,58 +2,96 @@ import './ChessBoard.css'
 import { useRef, useState } from 'react';
 import Square from '../Square/Square';
 import Referee from '../../Referee/Referee';
-import { HORIZONTAL_AXIS, VERTICAL_AXIS, SQUARE_LENGTH, BOARD_LENGTH, OFFSET, getInitialPieceState } from '../../utils/utils';
+import { HORIZONTAL_AXIS, VERTICAL_AXIS, SQUARE_LENGTH, BOARD_LENGTH, OFFSET, getInitialPieceState, IMG_URL } from '../../utils/utils';
 import PieceType from "../../utils/PieceType"
 import TeamType from "../../utils/TeamType"
 
-const generateBoard = (pieces)=>{
-    let board = [];
-
-    for(let j=VERTICAL_AXIS.length-1;j>=0;j--){
-        for(let i=0;i<HORIZONTAL_AXIS.length;i++){
-
-            const piece = pieces.find(p => p.x === i && p.y === j);
-            const imgSrc = piece ? piece.imgSrc : null;              
-
-            board.push(
-                <Square 
-                    row={j} 
-                    col={i} 
-                    imgSrc={imgSrc} 
-                    key={HORIZONTAL_AXIS[i]+VERTICAL_AXIS[j]}
-                />
-            );
-        }
-    }
-    return board;
-}
-
 function ChessBoard(){
 
-    const [gridX, setGridX] = useState(0);
-    const [gridY, setGridY] = useState(0);
+    const generateBoard = (pieces)=>{
+        let board = [];
+    
+        for(let j=VERTICAL_AXIS.length-1;j>=0;j--){
+            for(let i=0;i<HORIZONTAL_AXIS.length;i++){
+    
+                const piece = pieces.find(p => p.x === i && p.y === j);
+                const imgSrc = piece ? piece.imgSrc : null;
+                
+                const currentPiece = pieces.find(p => p.x === gridX && p.y === gridY);
+                const highlight = currentPiece && currentPiece.possibleMoves && currentPiece.possibleMoves.some(({x,y}) => x === i && y === j);
+
+                // if(highlight){
+                //     console.log("Possible move for currentPiece is: ", {i,j});
+                // }else{
+                //     console.log({i,j} , "is not a possible move for the current piece");
+                // }
+    
+                board.push(
+                    <Square 
+                        row={j} 
+                        col={i} 
+                        imgSrc={imgSrc} 
+                        highlight = {highlight}
+                        key={HORIZONTAL_AXIS[i]+VERTICAL_AXIS[j]}
+                    />
+                );
+            }
+        }
+        return board;
+    }
+
+    const [gridX, setGridX] = useState(null);
+    const [gridY, setGridY] = useState(null);
     const [activePiece, setActivePiece] = useState(null);
     const [pieces, setPieces] = useState(getInitialPieceState());
-    let board = generateBoard(pieces);
+    const [promotionPawn, setPromotionPawn] = useState(null);
+    const modalReference = useRef(null);
     const chessBoardReference = useRef(null);
     const referee = new Referee();
+    let board = generateBoard(pieces);
+
+    const updatePossibleMoves = (currentPiece, pieces)=>{
+        const possibleMoves = referee.addPossibleMoves(currentPiece, pieces);
+        const updatedPieces = pieces.reduce((result, p)=>{
+
+            if(p.x === currentPiece.x && p.y === currentPiece.y){
+                p.possibleMoves = possibleMoves;
+                // console.log(p);
+            }
+
+            result.push(p);
+            return result;
+        }, []);
+        setPieces(updatedPieces);
+    }
 
     const grabPiece = (e) => {
         const element = e.target;
         // console.log(element);
+
         const chessBoard = chessBoardReference.current;
-        if(element.classList.contains('chess-piece')){
+        if(element.classList.contains('chess-piece') && chessBoard){
 
-            setGridX(Math.floor((e.clientX-chessBoard.offsetLeft)/SQUARE_LENGTH));
-            setGridY(Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-BOARD_LENGTH)/SQUARE_LENGTH)));
+            const _gridX = Math.floor((e.clientX-chessBoard.offsetLeft)/SQUARE_LENGTH);
+            const _gridY = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-BOARD_LENGTH)/SQUARE_LENGTH));
 
-            const x = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
-            const y = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
+            setGridX(_gridX);
+            setGridY(_gridY);
+
+            const mouseX = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
+            const mouseY = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
             element.style.position = 'absolute';
-            element.style.left = `${x}px`;
-            element.style.top = `${y}px`;
+            element.style.left = `${mouseX}px`;
+            element.style.top = `${mouseY}px`;
             element.style.zIndex = `100`;
             setActivePiece(element);
+            // console.log(element);
+
+
+            const currentPiece = pieces.find(piece => piece.x === _gridX && piece.y === _gridY);
+            // console.log(`Current piece is: `, {...currentPiece});
+            updatePossibleMoves(currentPiece, pieces);
+            
 
         }
     }
@@ -68,13 +106,37 @@ function ChessBoard(){
             const maxX = minX + chessBoard.clientWidth-(SQUARE_LENGTH/2);
             const maxY = minY + chessBoard.clientHeight-(SQUARE_LENGTH/2);
 
-            const x = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
-            const y = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
+            const mouseX = e.clientX-(SQUARE_LENGTH/2)+OFFSET;
+            const mouseY = e.clientY-(SQUARE_LENGTH/2)+OFFSET; 
             activePiece.style.position = 'absolute';
-            activePiece.style.left = x < minX ? `${minX}px` : x > maxX ? `${maxX}px` : `${x}px`;
-            activePiece.style.top = y < minY ? `${minY}px` : y > maxY ? `${maxY}px` : `${y}px`;
+            activePiece.style.left = mouseX < minX ? `${minX}px` : mouseX > maxX ? `${maxX}px` : `${mouseX}px`;
+            activePiece.style.top = mouseY < minY ? `${minY}px` : mouseY > maxY ? `${maxY}px` : `${mouseY}px`;
 
         }
+    }
+
+    const getImageForPiece = (pieceType)=>{
+        if(promotionPawn){
+            const color = promotionPawn.team === TeamType.WHITE ? 'w' : 'b';
+            return `${IMG_URL}/${PieceType[pieceType].toLowerCase()}_${color}.png`;
+        }
+        return '';        
+    }
+
+    const promotePawn = (e)=>{
+        const updatedPieces = pieces.reduce((result, p)=>{
+            if(p.x === promotionPawn.x && p.y === promotionPawn.y){
+                const pieceType = e.target.attributes.alt.value;
+                p.pieceType = PieceType[pieceType];
+                p.imgSrc = getImageForPiece(pieceType);
+            }
+
+            result.push(p);
+            return result;
+        }, []);
+        setPieces(updatedPieces);
+
+        modalReference.current.classList.add("hide-modal");
     }
     
     const dropPiece = (e)=>{
@@ -115,6 +177,13 @@ function ChessBoard(){
                             p.enPassant = (p.pieceType === PieceType.PAWN && Math.abs(Math.abs(gridY - y)===2));
                             p.x = x;
                             p.y = y;
+
+                            const promotionRow = (p.pieceType !== PieceType.PAWN) ? null :  (p.team === TeamType.WHITE) ? 7 : 0;
+                            if(y === promotionRow){
+                                setPromotionPawn(p);
+                                modalReference.current.classList.remove("hide-modal");
+                            }
+                            
                             result.push(p);
                         } 
                         //Include only non-attacked pieces in the result
@@ -139,15 +208,26 @@ function ChessBoard(){
     }
 
     return (
-        <div 
-        onMouseDown={e => grabPiece(e)}
-        onMouseMove={e => movePiece(e)} 
-        onMouseUp={e => dropPiece(e)} 
-        id="chessBoard"
-        ref={chessBoardReference}
-        >
-            {board}
-        </div>
+        <>
+            <div id="modal" className='hide-modal' ref={modalReference}>
+                <div className="modal-body">
+                    <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.ROOK)} alt={PieceType.ROOK} draggable="false"></img>
+                    <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.KNIGHT)} alt={PieceType.KNIGHT} draggable="false"></img>
+                    <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.BISHOP)} alt={PieceType.BISHOP} draggable="false"></img>
+                    <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.QUEEN)} alt={PieceType.QUEEN} draggable="false"></img>
+                </div>
+            </div>
+            <div 
+            onMouseDown={e => grabPiece(e)}
+            onMouseMove={e => movePiece(e)} 
+            onMouseUp={e => dropPiece(e)} 
+            id="chessBoard"
+            ref={chessBoardReference}
+            >
+                {board}
+            </div>
+        </>
+        
     )
 }
 

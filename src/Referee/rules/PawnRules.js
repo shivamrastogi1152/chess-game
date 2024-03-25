@@ -33,3 +33,21 @@ export const isValidPawnMove = (fromX, fromY, toX, toY, team, pieceState) => {
 
   return false;
 };
+
+export const addPossibleMovesForPawn = (pawn, pieceState) => {
+  const firstRank = pawn.team === TeamType.WHITE ? 1 : 6;
+  const dirY = pawn.team === TeamType.WHITE ? 1 : -1;
+
+  const possibleMoves = [];
+
+  if (
+    pawn.y === firstRank &&
+    !isSquareOccupied(pawn.x, pawn.y + 2 * dirY, pieceState)
+  )
+    possibleMoves.push({ x: pawn.x, y: pawn.y + 2 * dirY });
+
+  if (!isSquareOccupied(pawn.x, pawn.y + dirY, pieceState))
+    possibleMoves.push({ x: pawn.x, y: pawn.y + dirY });
+
+  return possibleMoves;
+};
