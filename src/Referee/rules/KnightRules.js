@@ -1,4 +1,8 @@
-import { isSquareOccupied, isSquareOccupiedByOpponent } from "./GeneralRules";
+import {
+  isSquareOccupied,
+  isSquareOccupiedByOpponent,
+  withinBounds,
+} from "./GeneralRules";
 
 export const isValidKnightMove = (fromX, fromY, toX, toY, team, pieceState) => {
   if (
@@ -11,4 +15,31 @@ export const isValidKnightMove = (fromX, fromY, toX, toY, team, pieceState) => {
     );
   }
   return false;
+};
+
+export const addPossibleMovesForKnight = (knight, pieceState) => {
+  const possibleMoves = [];
+  const dir = [
+    { x: 1, y: 2 },
+    { x: -1, y: 2 },
+    { x: 1, y: -2 },
+    { x: -1, y: -2 },
+    { x: 2, y: 1 },
+    { x: -2, y: 1 },
+    { x: 2, y: -1 },
+    { x: -2, y: -1 },
+  ];
+
+  dir.forEach((d) => {
+    const nextX = knight.x + d.x;
+    const nextY = knight.y + d.y;
+
+    if (
+      withinBounds(nextX, nextY) &&
+      (!isSquareOccupied(nextX, nextY, pieceState) ||
+        isSquareOccupiedByOpponent(nextX, nextY, pieceState, knight.team))
+    )
+      possibleMoves.push({ x: nextX, y: nextY });
+  });
+  return possibleMoves;
 };

@@ -2,12 +2,17 @@ import PieceType from "../utils/PieceType";
 import TeamType from "../utils/TeamType";
 import {
   isValidBishopMove,
+  addPossibleMovesForBishop,
   isValidKingMove,
+  addPossibleMovesForKing,
   isValidKnightMove,
+  addPossibleMovesForKnight,
   isValidPawnMove,
   addPossibleMovesForPawn,
   isValidQueenMove,
+  addPossibleMovesForQueen,
   isValidRookMove,
+  addPossibleMovesForRook,
 } from "./rules";
 
 class Referee {
@@ -57,6 +62,17 @@ class Referee {
   addPossibleMoves(currentPiece, pieceState) {
     if (currentPiece.pieceType === PieceType.PAWN)
       return addPossibleMovesForPawn(currentPiece, pieceState);
+    else if (currentPiece.pieceType === PieceType.KNIGHT)
+      return addPossibleMovesForKnight(currentPiece, pieceState);
+    else if (currentPiece.pieceType === PieceType.BISHOP)
+      return addPossibleMovesForBishop(currentPiece, pieceState);
+    else if (currentPiece.pieceType === PieceType.ROOK)
+      return addPossibleMovesForRook(currentPiece, pieceState);
+    else if (currentPiece.pieceType === PieceType.QUEEN)
+      return addPossibleMovesForQueen(currentPiece, pieceState);
+    else if (currentPiece.pieceType === PieceType.KING)
+      return addPossibleMovesForKing(currentPiece, pieceState);
+    return [];
   }
 }
 

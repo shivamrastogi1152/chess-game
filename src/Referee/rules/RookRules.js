@@ -1,4 +1,8 @@
-import { isSquareOccupied, isSquareOccupiedByOpponent } from "./GeneralRules";
+import {
+  isSquareOccupied,
+  isSquareOccupiedByOpponent,
+  withinBounds,
+} from "./GeneralRules";
 
 export const isValidRookMove = (fromX, fromY, toX, toY, team, pieceState) => {
   const deltaX = Math.abs(toX - fromX);
@@ -29,4 +33,37 @@ export const isValidRookMove = (fromX, fromY, toX, toY, team, pieceState) => {
   }
 
   return false;
+};
+
+export const addPossibleMovesForRook = (rook, pieceState) => {
+  const possibleMoves = [];
+
+  const dir = [
+    { x: -1, y: 0 },
+    { x: 1, y: 0 },
+    { x: 0, y: -1 },
+    { x: 0, y: 1 },
+  ];
+
+  dir.forEach((d) => {
+    for (let step = 1; step < 8; step++) {
+      const nextX = rook.x + d.x * step;
+      const nextY = rook.y + d.y * step;
+
+      if (!withinBounds(nextX, nextY)) break;
+
+      if (isSquareOccupiedByOpponent(nextX, nextY, pieceState, rook.team)) {
+        possibleMoves.push({ x: nextX, y: nextY });
+        break;
+      }
+
+      if (isSquareOccupied(nextX, nextY, pieceState)) {
+        break;
+      }
+
+      possibleMoves.push({ x: nextX, y: nextY });
+    }
+  });
+
+  return possibleMoves;
 };

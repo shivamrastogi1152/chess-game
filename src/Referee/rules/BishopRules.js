@@ -1,4 +1,8 @@
-import { isSquareOccupied, isSquareOccupiedByOpponent } from "./GeneralRules";
+import {
+  isSquareOccupied,
+  isSquareOccupiedByOpponent,
+  withinBounds,
+} from "./GeneralRules";
 
 export const isValidBishopMove = (fromX, fromY, toX, toY, team, pieceState) => {
   const deltaX = Math.abs(toX - fromX);
@@ -29,4 +33,37 @@ export const isValidBishopMove = (fromX, fromY, toX, toY, team, pieceState) => {
   }
 
   return false;
+};
+
+export const addPossibleMovesForBishop = (bishop, pieceState) => {
+  const possibleMoves = [];
+
+  const dir = [
+    { x: -1, y: -1 },
+    { x: -1, y: 1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 1 },
+  ];
+
+  dir.forEach((d) => {
+    for (let step = 1; step < 8; step++) {
+      const nextX = bishop.x + d.x * step;
+      const nextY = bishop.y + d.y * step;
+
+      if (!withinBounds(nextX, nextY)) break;
+
+      if (isSquareOccupiedByOpponent(nextX, nextY, pieceState, bishop.team)) {
+        possibleMoves.push({ x: nextX, y: nextY });
+        break;
+      }
+
+      if (isSquareOccupied(nextX, nextY, pieceState)) {
+        break;
+      }
+
+      possibleMoves.push({ x: nextX, y: nextY });
+    }
+  });
+
+  return possibleMoves;
 };
