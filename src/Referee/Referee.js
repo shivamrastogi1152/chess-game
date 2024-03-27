@@ -59,7 +59,7 @@ class Referee {
     return false;
   }
 
-  addPossibleMoves(currentPiece, pieceState) {
+  getPossibleMoves(currentPiece, pieceState) {
     if (currentPiece.pieceType === PieceType.PAWN)
       return addPossibleMovesForPawn(currentPiece, pieceState);
     else if (currentPiece.pieceType === PieceType.KNIGHT)

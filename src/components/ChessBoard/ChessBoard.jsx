@@ -51,11 +51,10 @@ function ChessBoard(){
     let board = generateBoard(pieces);
 
     const updatePossibleMoves = (currentPiece, pieces)=>{
-        const possibleMoves = referee.addPossibleMoves(currentPiece, pieces);
         const updatedPieces = pieces.reduce((result, p)=>{
 
             if(p.x === currentPiece.x && p.y === currentPiece.y){
-                p.possibleMoves = possibleMoves;
+                p.possibleMoves = referee.getPossibleMoves(currentPiece, pieces);
                 // console.log(p);
             }
 
