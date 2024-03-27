@@ -45,14 +45,22 @@
     cursor: grabbing;
 }
 
-.highlight::before{
+.highlight:not(.chess-piece-square)::before{
     content: " ";
     height: 15px;
     width: 15px;
     border-radius: 50%;
     background-color: black;  
     opacity: 0.2;
-    margin: 2px;
+}
+
+.highlight.chess-piece-square::before{
+    position: absolute;
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    border: 5px solid black;
+    opacity: 0.2;
 }
 
 
