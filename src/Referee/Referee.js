@@ -37,7 +37,8 @@ class Referee {
     return false;
   }
 
-  isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
+  isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState, turn) {
+    if (team !== turn) return false;
     // console.log(
     //   `Moving ${team} ${pieceType} from (${fromX}, ${fromY}) to (${toX}, ${toY})`
     // );

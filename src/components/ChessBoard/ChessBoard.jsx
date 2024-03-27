@@ -45,6 +45,8 @@ function ChessBoard(){
     const [activePiece, setActivePiece] = useState(null);
     const [pieces, setPieces] = useState(getInitialPieceState());
     const [promotionPawn, setPromotionPawn] = useState(null);
+    const [turn, setTurn] = useState(TeamType.WHITE);
+    const [numberOfMoves, setNumberOfMoves] = useState(0);
     const modalReference = useRef(null);
     const chessBoardReference = useRef(null);
     const referee = new Referee();
@@ -54,9 +56,11 @@ function ChessBoard(){
         const possibleMoves = referee.addPossibleMoves(currentPiece, pieces);
         const updatedPieces = pieces.reduce((result, p)=>{
 
-            if(p.x === currentPiece.x && p.y === currentPiece.y){
+            if(p.x === currentPiece.x && p.y === currentPiece.y && turn === currentPiece.team){
                 p.possibleMoves = possibleMoves;
                 // console.log(p);
+            } else{
+                p.possibleMoves = [];
             }
 
             result.push(p);
@@ -90,8 +94,7 @@ function ChessBoard(){
 
             const currentPiece = pieces.find(piece => piece.x === _gridX && piece.y === _gridY);
             // console.log(`Current piece is: `, {...currentPiece});
-            updatePossibleMoves(currentPiece, pieces);
-            
+            updatePossibleMoves(currentPiece, pieces, turn);
 
         }
     }
@@ -147,7 +150,6 @@ function ChessBoard(){
             const y = Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-BOARD_LENGTH)/SQUARE_LENGTH));
 
             const currentPiece = pieces.find(piece => piece.x === gridX && piece.y === gridY);
-            // console.log(`Current piece is: `, currentPiece);
 
             if(currentPiece){
                 if(referee.isEnPassantMove(gridX, gridY, x, y, currentPiece.pieceType, currentPiece.team, pieces)){
@@ -165,12 +167,10 @@ function ChessBoard(){
                         return result;
                     }, []);
                     setPieces(updatedPieces);
+                    setTurn(turn === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE);
+                    setNumberOfMoves(numberOfMoves+1);
                 }
-                // isValidMove() handles:
-                // 1. PieceType movement logic
-                // 2. PieceType attacking logic
-                 //In case of a valid move update the pieces state accordingly
-                else if(referee.isValidMove(currentPiece.x, currentPiece.y, x, y, currentPiece.pieceType, currentPiece.team, pieces)){
+                else if(referee.isValidMove(currentPiece.x, currentPiece.y, x, y, currentPiece.pieceType, currentPiece.team, pieces, turn)){
                     const updatedPieces = pieces.reduce((result, p)=>{
                         //Update current piece's position to new position
                         if(p.x === gridX && p.y === gridY){
@@ -194,6 +194,8 @@ function ChessBoard(){
                         return result;
                     }, []);
                     setPieces(updatedPieces);
+                    setTurn(turn === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE);
+                    setNumberOfMoves(numberOfMoves+1);
                 }
                 // Not a valid move -> return the piece back to original position
                 else{
@@ -216,6 +218,10 @@ function ChessBoard(){
                     <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.BISHOP)} alt={PieceType.BISHOP} draggable="false"></img>
                     <img onClick={(e)=> promotePawn(e)} src={getImageForPiece(PieceType.QUEEN)} alt={PieceType.QUEEN} draggable="false"></img>
                 </div>
+            </div>
+            <div className="textbox">
+                <div className="text">{turn} to play!</div>
+                <div>Move Counter: {numberOfMoves}</div>
             </div>
             <div 
             onMouseDown={e => grabPiece(e)}
