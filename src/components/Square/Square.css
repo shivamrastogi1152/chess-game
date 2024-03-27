@@ -56,6 +56,7 @@
 
 .highlight.chess-piece-square::before{
     position: absolute;
+    content: " ";
     height: 70px;
     width: 70px;
     border-radius: 50%;
