@@ -1,79 +1,70 @@
-import PieceType from "../utils/PieceType";
-import TeamType from "../utils/TeamType";
+import { PieceType } from "../constants";
 import {
-  isValidBishopMove,
-  addPossibleMovesForBishop,
-  isValidKingMove,
-  addPossibleMovesForKing,
-  isValidKnightMove,
-  addPossibleMovesForKnight,
-  isValidPawnMove,
-  addPossibleMovesForPawn,
-  isValidQueenMove,
-  addPossibleMovesForQueen,
-  isValidRookMove,
-  addPossibleMovesForRook,
-} from "./rules";
+  getRookMoves,
+  getKnightMoves,
+  getBishopMoves,
+  getQueenMoves,
+  getKingMoves,
+  getPawnMoves,
+  getPawnAttackMoves,
+} from "./getMoves";
+import { movePawn, movePiece } from "./move";
 
-class Referee {
-  isEnPassantMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
-    const dirY = team === TeamType.WHITE ? 1 : -1;
-
-    if (
-      pieceType === PieceType.PAWN &&
-      Math.abs(fromX - toX) === 1 &&
-      toY - fromY === dirY
-    ) {
-      const piece = pieceState.find(
-        (p) =>
-          p.x === toX &&
-          p.y === toY - dirY &&
-          p.pieceType === PieceType.PAWN &&
-          p.enPassant
-      );
-      if (piece) return true;
-    }
-
-    return false;
-  }
-
-  isValidMove(fromX, fromY, toX, toY, pieceType, team, pieceState) {
-    // console.log(
-    //   `Moving ${team} ${pieceType} from (${fromX}, ${fromY}) to (${toX}, ${toY})`
-    // );
-    if (pieceType === PieceType.PAWN)
-      return isValidPawnMove(fromX, fromY, toX, toY, team, pieceState);
-    else if (pieceType === PieceType.KNIGHT)
-      return isValidKnightMove(fromX, fromY, toX, toY, team, pieceState);
-    else if (pieceType === PieceType.BISHOP)
-      return isValidBishopMove(fromX, fromY, toX, toY, team, pieceState);
-    else if (pieceType === PieceType.ROOK)
-      return isValidRookMove(fromX, fromY, toX, toY, team, pieceState);
-    else if (pieceType === PieceType.QUEEN)
-      return isValidQueenMove(fromX, fromY, toX, toY, team, pieceState);
-    else if (pieceType === PieceType.KING)
-      return isValidKingMove(fromX, fromY, toX, toY, team, pieceState);
-    // console.log(
-    //   `${team} ${pieceType} can't be moved from (${fromX},${fromY}) to (${toX},${toY})`
-    // );
-    return false;
-  }
-
-  getPossibleMoves(currentPiece, pieceState) {
-    if (currentPiece.pieceType === PieceType.PAWN)
-      return addPossibleMovesForPawn(currentPiece, pieceState);
-    else if (currentPiece.pieceType === PieceType.KNIGHT)
-      return addPossibleMovesForKnight(currentPiece, pieceState);
-    else if (currentPiece.pieceType === PieceType.BISHOP)
-      return addPossibleMovesForBishop(currentPiece, pieceState);
-    else if (currentPiece.pieceType === PieceType.ROOK)
-      return addPossibleMovesForRook(currentPiece, pieceState);
-    else if (currentPiece.pieceType === PieceType.QUEEN)
-      return addPossibleMovesForQueen(currentPiece, pieceState);
-    else if (currentPiece.pieceType === PieceType.KING)
-      return addPossibleMovesForKing(currentPiece, pieceState);
-    return [];
-  }
+function getPieceType(piece) {
+  return piece.split("_")[0];
 }
 
-export default Referee;
+const referee = {
+  getRegularMoves: function ({ currentPosition, rank, file, piece }) {
+    const pieceType = getPieceType(piece);
+
+    if (pieceType === PieceType.ROOK)
+      return getRookMoves({ currentPosition, rank, file, piece });
+    if (pieceType === PieceType.KNIGHT)
+      return getKnightMoves({ currentPosition, rank, file, piece });
+    if (pieceType === PieceType.BISHOP)
+      return getBishopMoves({ currentPosition, rank, file, piece });
+    if (pieceType === PieceType.QUEEN)
+      return getQueenMoves({ currentPosition, rank, file, piece });
+    if (pieceType === PieceType.KING)
+      return getKingMoves({ currentPosition, rank, file, piece });
+    if (pieceType === PieceType.PAWN) {
+      return getPawnMoves({ currentPosition, rank, file, piece });
+    }
+
+    return [];
+  },
+
+  getValidMoves: function ({
+    currentPosition,
+    prevPosition,
+    rank,
+    file,
+    piece,
+  }) {
+    let moves = this.getRegularMoves({ currentPosition, rank, file, piece });
+    if (getPieceType(piece) === PieceType.PAWN) {
+      moves = [
+        ...moves,
+        ...getPawnAttackMoves({
+          currentPosition,
+          prevPosition,
+          rank,
+          file,
+          piece,
+        }),
+      ];
+    }
+    return moves;
+  },
+
+  performMove: function ({ position, piece, fromRow, fromCol, toRow, toCol }) {
+    if (getPieceType(piece) === PieceType.PAWN) {
+      return movePawn({ position, piece, fromRow, fromCol, toRow, toCol });
+    } else {
+      return movePiece({ position, piece, fromRow, fromCol, toRow, toCol });
+    }
+  },
+};
+
+export default referee;

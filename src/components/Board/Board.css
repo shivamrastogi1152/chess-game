@@ -1,0 +1,45 @@
+.board{
+    display: grid;
+    position: relative;
+    grid-template-columns: calc(0.25*var(--tile-size)) calc(8*var(--tile-size));
+}
+
+.tiles{
+    display: grid;
+    grid-template-columns: repeat(8, var(--tile-size));
+    grid-template-rows: repeat(8, var(--tile-size));
+    width: calc(8*var(--tile-size));
+}
+
+.tile{
+
+}
+
+.tile--light{
+    background: var(--light-tile);
+}
+
+.tile--dark{
+    background: var(--dark-tile);
+}
+
+.highlight::after{
+    content: '';
+    display: block;
+    position: relative;
+    width: calc(0.5*var(--tile-size));
+    height: calc(0.5*var(--tile-size));
+    border-radius: 50%;
+    background-color: var(--highlight);
+    top: 25%;
+    left: 25%;
+}
+
+.attacking::after{
+    content: '';
+    display: block;
+    position: relative;
+    width: calc(var(--tile-size));
+    height: calc(var(--tile-size));
+    background-color: rgba(255,0,0,0.7);
+}

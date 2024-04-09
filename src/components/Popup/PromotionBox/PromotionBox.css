@@ -1,0 +1,32 @@
+.promotion-choices{
+    height: 12.5%;
+}
+
+.promotion-choices .piece{
+    width: 25%;
+    height: 100%;
+    /* border: 1px solid var(--dark-tile); */
+    /* border-radius: 25px; */
+}
+
+.promotion-choices .piece:hover{
+    /* box-shadow: 0 0 0 5px  var(--dark-tile) inset; */
+    /* background-color: rgba(194, 249, 112); */
+    background-color: var(--dark-tile);
+    border-radius: 10%;
+    transform: scale(1.1);
+    cursor:pointer
+}
+
+.promotion-choices :is(.queen_w, .queen_b){
+    left: 0;
+}
+.promotion-choices :is(.rook_w, .rook_b){
+    left: 25%;
+}
+.promotion-choices :is(.bishop_w, .bishop_b){
+    left: 50%;
+}
+.promotion-choices :is(.knight_w, .knight_b){
+    left: 75%;
+}

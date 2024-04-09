@@ -1,0 +1,18 @@
+.popup{
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: calc(0.25*var(--tile-size));
+    bottom: calc(0.25*var(--tile-size));
+}
+
+.popup-inner{
+    width: 50%;
+    min-height: 10%;
+    background: var(--light-tile);
+    position: absolute;
+    border: 5px solid var(--light-tile);
+    box-shadow: 0 0 0 5px var(--dark-tile);
+    opacity: 0.8;
+    border-radius: 25px;
+}
