@@ -4,7 +4,7 @@ import Files from "./bits/Files";
 import Pieces from "./Pieces/Pieces"
 import { useAppContext } from "../../contexts/context";
 import Popup from "../Popup/Popup";
-import referee from "../../referee/referee";
+import referee from "../../referee/referee.js";
 import { getKingPosition } from "../../referee/getMoves";
 import PromotionBox from "../Popup/PromotionBox/PromotionBox";
 import GameEndsBox from "../Popup/GameEndsBox/GameEndsBox";
