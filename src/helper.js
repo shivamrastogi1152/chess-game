@@ -18,6 +18,7 @@ export const getInitPosition = () => {
     position[rank][3] = `queen_${color}`;
     position[rank][4] = `king_${color}`;
   }
+
   return position;
 };
 
@@ -30,4 +31,22 @@ export const copyPosition = (position) => {
   }
 
   return newPosition;
+};
+
+export const areSameColorSquares = (coords1, coords2) => {
+  return (
+    (coords1.rank + coords1.file) % 2 === (coords2.rank + coords2.file) % 2
+  );
+};
+
+export const findPieceCoords = (position, piece) => {
+  const result = [];
+  position.forEach((row, r) => {
+    row.forEach((col, c) => {
+      if (position[r][c] === piece) {
+        result.push({ rank: r, file: c });
+      }
+    });
+  });
+  return result;
 };

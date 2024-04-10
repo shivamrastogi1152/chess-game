@@ -44,6 +44,43 @@ export function reducer(state, action) {
       };
     }
 
+    case ACTION_TYPE.UPDATE_CASTLE_STATE: {
+      const { turn, castleDirection } = state;
+      castleDirection[turn] = action.payload;
+      return {
+        ...state,
+        castleDirection,
+      };
+    }
+
+    case ACTION_TYPE.STALEMATE: {
+      return {
+        ...state,
+        gameStatus: GameStatus.STALEMATE,
+      };
+    }
+
+    case ACTION_TYPE.INSUFFICIENT_MATERIAL: {
+      return {
+        ...state,
+        gameStatus: GameStatus.INSUFFICIENT_MATERIAL,
+      };
+    }
+
+    case ACTION_TYPE.NEW_GAME: {
+      return {
+        ...action.payload,
+      };
+    }
+
+    case ACTION_TYPE.WIN: {
+      return {
+        ...state,
+        gameStatus:
+          action.payload === "w" ? GameStatus.WHITE_WIN : GameStatus.BLACK_WIN,
+      };
+    }
+
     default: {
       return state;
     }

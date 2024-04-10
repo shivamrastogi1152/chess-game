@@ -1,10 +1,10 @@
+import React from 'react';
 import { GameStatus } from '../../constants';
 import { useAppContext } from '../../contexts/context';
 import { closePopup } from '../../reducer/actions/popup';
 import './Popup.css'
-import PromotionBox from './PromotionBox/PromotionBox';
 
-const Popup = ()=>{
+const Popup = ({children})=>{
 
     const {appState, dispatch} = useAppContext();
 
@@ -12,16 +12,17 @@ const Popup = ()=>{
         dispatch(closePopup());
     }
 
-    if(appState.gameStatus === GameStatus.PAWN_PROMOTION){
-        return (
-            <div className='popup'>
-                <PromotionBox OnClosePopup={OnClosePopup}/>
-            </div>
-        )
-    }
+    if(appState.gameStatus === GameStatus.IN_PROGRESS) return null;
 
-    else return null
     
+    return (
+        <div className='popup'>
+            {React.Children
+            .toArray(children)
+            .map(child => React.cloneElement(child, {OnClosePopup}))}
+        </div>
+    )
+
 }
 
 export default Popup;

@@ -14,6 +14,8 @@ export const GameStatus = {
   PAWN_PROMOTION: "pawnPromotion",
   WHITE_WIN: "White wins!",
   BLACK_WIN: "Black wins!",
+  STALEMATE: "Draw by Stalemate",
+  INSUFFICIENT_MATERIAL: "Draw by Insufficient material",
 };
 
 export const initGameState = {
@@ -22,4 +24,8 @@ export const initGameState = {
   candidateMoves: [],
   gameStatus: GameStatus.IN_PROGRESS,
   promotionSquare: null,
+  castleDirection: {
+    w: "Both",
+    b: "Both",
+  },
 };

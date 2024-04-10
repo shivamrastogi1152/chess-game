@@ -1,7 +1,12 @@
 import { PieceType } from "../constants";
+import referee from "./referee";
 
 function getPieceColor(piece) {
   return piece[piece.length - 1];
+}
+
+function getPieceType(piece) {
+  return piece.split("_")[0];
 }
 
 function isValidSquare(rank, file) {
@@ -229,4 +234,200 @@ export function getPawnAttackMoves({
   }
 
   return moves;
+}
+
+export function getCastlingMoves({
+  currentPosition,
+  castleDirection,
+  rank,
+  file,
+  piece,
+}) {
+  const moves = [];
+  const us = getPieceColor(piece);
+  const opponent = us === "w" ? "b" : "w";
+  const kingOriginalRank = us === "w" ? 0 : 7;
+
+  const longCastlingSquares = [
+    [kingOriginalRank, 3],
+    [kingOriginalRank, 2],
+    [kingOriginalRank, 1],
+  ];
+
+  const shortCastlingSquares = [
+    [kingOriginalRank, 5],
+    [kingOriginalRank, 6],
+  ];
+
+  if (file !== 4 || rank !== kingOriginalRank || castleDirection === "none")
+    return moves;
+
+  //Cannot castle if we're currently under check!
+  if (referee.playerInCheck({ positionAfterMove: currentPosition, player: us }))
+    return moves;
+
+  //Check for long castle
+  //1. Check if castling is allowed
+  //2. Check that there should be NO pieces between left rook and king
+  //3. Check that left rook is still in original place
+  // (If it's moved earlier and now back to original place, castle direction would be changed to 'Right')
+  // Above case is handled in getCastleDirections() func
+  //4. All squares between rook and king should not be under attack!!!
+
+  if (
+    ["Left", "Both"].includes(castleDirection) &&
+    !currentPosition[kingOriginalRank][3] &&
+    !currentPosition[kingOriginalRank][2] &&
+    !currentPosition[kingOriginalRank][1] &&
+    currentPosition[kingOriginalRank][0] === `${PieceType.ROOK}_${us}` &&
+    !referee.playerInCheck({
+      positionAfterMove: referee.performMove({
+        position: currentPosition,
+        piece,
+        fromRow: rank,
+        fromCol: file,
+        toRow: kingOriginalRank,
+        toCol: 3,
+      }),
+      player: us,
+    }) &&
+    !referee.playerInCheck({
+      positionAfterMove: referee.performMove({
+        position: currentPosition,
+        piece,
+        fromRow: rank,
+        fromCol: file,
+        toRow: kingOriginalRank,
+        toCol: 2,
+      }),
+      player: us,
+    }) &&
+    !referee.playerInCheck({
+      positionAfterMove: referee.performMove({
+        position: currentPosition,
+        piece,
+        fromRow: rank,
+        fromCol: file,
+        toRow: kingOriginalRank,
+        toCol: 1,
+      }),
+      player: us,
+    })
+  ) {
+    moves.push([kingOriginalRank, 2]);
+  }
+
+  //Check for short castle
+  //1. Check if castling is allowed
+  //2. Check that there should be NO pieces between right rook and king
+  //3. Check that right rook is still in original place
+  // (If it's moved earlier and now back to original place, castle direction would be changed to 'Left')
+  // Above case is handled in getCastleDirections() func
+  //4. All squares between rook and king should not be under attack!!!
+
+  if (
+    ["Right", "Both"].includes(castleDirection) &&
+    !currentPosition[kingOriginalRank][5] &&
+    !currentPosition[kingOriginalRank][6] &&
+    currentPosition[kingOriginalRank][7] === `${PieceType.ROOK}_${us}` &&
+    !referee.playerInCheck({
+      positionAfterMove: referee.performMove({
+        position: currentPosition,
+        piece,
+        fromRow: rank,
+        fromCol: file,
+        toRow: kingOriginalRank,
+        toCol: 5,
+      }),
+      player: us,
+    }) &&
+    !referee.playerInCheck({
+      positionAfterMove: referee.performMove({
+        position: currentPosition,
+        piece,
+        fromRow: rank,
+        fromCol: file,
+        toRow: kingOriginalRank,
+        toCol: 5,
+      }),
+      player: us,
+    })
+  ) {
+    moves.push([kingOriginalRank, 6]);
+  }
+
+  return moves;
+}
+
+export function getCastleDirections({ castleDirection, piece, rank, file }) {
+  const color = getPieceColor(piece);
+  const pieceType = getPieceType(piece);
+  const initialRank = color === "w" ? 0 : 7;
+  const direction = castleDirection[color];
+
+  //If the king has been moved even once then castling is not allowed anymore!
+  if (pieceType === PieceType.KING) {
+    return "None";
+  }
+
+  //If any rook present at it's original posn has been moved
+  //then that rook can't be used for castling -> We can't castle to that side of the board!
+  if (pieceType === PieceType.ROOK) {
+    if (file === 0 && rank === initialRank) {
+      if (direction === "Both") return "Right";
+      if (direction === "Left") return "None";
+    }
+
+    if (file === 7 && rank === initialRank) {
+      if (direction === "Both") return "Left";
+      if (direction === "Right") return "None";
+    }
+  }
+}
+
+export function getKingPosition(position, player) {
+  let kingPos = null;
+  position.forEach((row, r) => {
+    row.forEach((col, c) => {
+      const piece = position[r][c];
+      const pieceType = getPieceType(piece);
+      const color = getPieceColor(piece);
+
+      if (pieceType === PieceType.KING && color === player) {
+        kingPos = [r, c];
+        return kingPos;
+      }
+    });
+  });
+
+  return kingPos;
+}
+export function getPiecesOfPlayer(position, player) {
+  const pieces = [];
+  position.forEach((row, r) => {
+    row.forEach((col, c) => {
+      const piece = position[r][c];
+      const color = getPieceColor(piece);
+
+      if (color === player) {
+        pieces.push({
+          piece: position[r][c],
+          rank: r,
+          file: c,
+        });
+      }
+    });
+  });
+
+  return pieces;
+}
+
+export function getAllPieces(position) {
+  const pieces = [];
+  position.forEach((row, r) => {
+    row.forEach((col, c) => {
+      if (position[r][c] !== "") pieces.push(position[r][c]);
+    });
+  });
+  return pieces;
 }

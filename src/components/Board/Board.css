@@ -11,10 +11,6 @@
     width: calc(8*var(--tile-size));
 }
 
-.tile{
-
-}
-
 .tile--light{
     background: var(--light-tile);
 }
@@ -42,4 +38,8 @@
     width: calc(var(--tile-size));
     height: calc(var(--tile-size));
     background-color: rgba(255,0,0,0.7);
+}
+
+.checked{
+    background-color: var(--check)
 }

@@ -1,0 +1,10 @@
+.popup-inner{
+    width: 50%;
+    min-height: 10%;
+    background: var(--light-tile);
+    position: absolute;
+    border: 5px solid var(--light-tile);
+    box-shadow: 0 0 0 5px var(--dark-tile);
+    opacity: 0.8;
+    border-radius: 25px;
+}

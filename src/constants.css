@@ -1,9 +1,10 @@
 :root{
-    --tile-size: 100px;
+    --tile-size: 80px;
     --light-tile: #F0D9B5;
     --dark-tile: #B58863;
     --bg-color: #202020;
     --highlight: rgba(0,0,0,0.1);
+    --check: #FEEC48;
 }
 
 @media all and (max-width: 450px) {

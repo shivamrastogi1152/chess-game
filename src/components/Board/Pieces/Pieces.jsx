@@ -1,18 +1,28 @@
 import "./Pieces.css";
 import Piece from "./Piece";
-import { useState, useRef } from "react";
-import { getInitPosition, copyPosition } from "../../../helper";
+import {  useRef } from "react";
 import { useAppContext } from "../../../contexts/context";
 import { clearCandidateMoves, makeNewMove } from "../../../reducer/actions/move";
 import referee from "../../../referee/referee";
 import { PieceType } from "../../../constants";
 import { openPromotion } from "../../../reducer/actions/popup";
+import { triggerCheckmate, triggerInsufficientMaterial, updateCastling } from "../../../reducer/actions/game";
+import { getCastleDirections } from "../../../referee/getMoves";
+import {triggerStalemate} from "../../../reducer/actions/game"
 
 const Pieces = () => {
 
   const ref = useRef();
   const {appState, dispatch} = useAppContext();
   const currentPosition = appState.positions[appState.positions.length-1];
+
+  function getPieceType(piece) {
+    return piece.split("_")[0];
+  }
+
+  function getPieceColor(piece){
+    return piece[piece.length-1];
+  }
 
   function calculateCoords(e){
     const {width, left, top} = ref.current.getBoundingClientRect();
@@ -24,8 +34,18 @@ const Pieces = () => {
   }
 
   function openPromotionBox({fromRow, fromCol, toRow, toCol}){
-    console.log(fromRow, fromCol, toRow, toCol);
     dispatch(openPromotion({fromRow : Number(fromRow), fromCol: Number(fromCol), toRow: Number(toRow), toCol: Number(toCol)}));
+  }
+
+  function updateCastlingState({piece, fromRow, fromCol}){
+    const direction = getCastleDirections({
+      castleDirection: appState.castleDirection,
+      piece, rank : Number(fromRow), file: Number(fromCol)
+    });
+
+    if(direction){
+      dispatch(updateCastling(direction))
+    }
   }
 
   function move(e){
@@ -33,13 +53,37 @@ const Pieces = () => {
     const [piece, fromRow, fromCol] = e.dataTransfer.getData('text').split(",");
     if(appState.candidateMoves?.find(m => m[0] == toRow && m[1] == toCol)){
 
+      const currentPlayer = getPieceColor(piece);
+      const opponent = getPieceColor(piece) === "w" ? "b" : "w";
+      const castleDirection = appState.castleDirection[opponent];
+
+      //Handle pawn promotion!
       if((piece === PieceType.PAWN + `_w` && toRow === 7) ||  (piece === PieceType.PAWN + `_b` && toRow === 0)){
         openPromotionBox({fromRow, fromCol, toRow, toCol});
         return;
       }
 
+      if(getPieceType(piece) === PieceType.KING || getPieceType(piece) === PieceType.ROOK){
+        updateCastlingState({piece, fromRow, fromCol});
+      }
+
       const newPosition = referee.performMove({position : currentPosition, piece, fromRow, fromCol, toRow, toCol});
       dispatch(makeNewMove({newPosition}));
+
+      if(referee.isCheckMate(newPosition, opponent, castleDirection)){
+        dispatch(triggerCheckmate(currentPlayer));
+      }
+
+      if(referee.insufficientMaterial(newPosition)){
+        console.log("Insufficient");
+        dispatch(triggerInsufficientMaterial())
+      }
+
+      
+      if(referee.playerInStalemate(newPosition, opponent, castleDirection)){
+        dispatch(triggerStalemate());
+      }
+
     }
     dispatch(clearCandidateMoves());
   }

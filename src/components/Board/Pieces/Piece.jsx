@@ -5,7 +5,7 @@ import referee from "../../../referee/referee";
 const Piece = ({rank, file, piece})=>{
 
     const {appState, dispatch} = useAppContext();
-    const {turn} = appState;
+    const {turn, castleDirection} = appState;
     const currentPosition = appState.positions[appState.positions.length-1];
     const prevPosition = appState.positions[appState.positions.length-2];
 
@@ -22,7 +22,7 @@ const Piece = ({rank, file, piece})=>{
 
         const pieceColor = getPieceColor(piece);
         if(turn === pieceColor){
-            const candidateMoves = referee.getValidMoves({currentPosition,prevPosition, rank, file, piece});
+            const candidateMoves = referee.getValidMoves({currentPosition, prevPosition, castleDirection: castleDirection[turn], rank, file, piece});
             dispatch(updateCandidateMoves({candidateMoves}));
         }
 
