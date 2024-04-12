@@ -1,6 +1,6 @@
 import { PieceType } from '../../../constants';
 import { useAppContext } from '../../../contexts/context';
-import { copyPosition } from '../../../helper';
+import { copyPosition, getMoveNotation } from '../../../helper';
 import { clearCandidateMoves, makeNewMove } from '../../../reducer/actions/move';
 import './PromotionBox.css'
 
@@ -30,10 +30,19 @@ const PromotionBox = ({OnClosePopup})=>{
         const currentPosition = appState.positions[appState.positions.length-1];
         const newPosition = copyPosition(currentPosition);
 
-        newPosition[promotionSquare.fromRow][promotionSquare.fromCol] = '';
-        newPosition[promotionSquare.toRow][promotionSquare.toCol] = `${option}_${color}`;
+        const {fromRow, fromCol, toRow, toCol} = promotionSquare;
+        const promotedToPiece = `${option}_${color}`;
 
-        dispatch(makeNewMove({newPosition}));
+        newPosition[fromRow][fromCol] = '';
+        newPosition[toRow][toCol] = promotedToPiece;
+
+        const moveNotation = getMoveNotation({
+            piece: PieceType.PAWN + `_${color}`,
+            fromRow, fromCol, toRow, toCol, promotesTo: promotedToPiece, 
+            currentPosition, positionAfterMove: newPosition
+        })
+
+        dispatch(makeNewMove({newPosition, moveNotation}));
         dispatch(clearCandidateMoves());
 
     }

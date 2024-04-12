@@ -4,14 +4,18 @@ import { ACTION_TYPE } from "./actionType";
 export function reducer(state, action) {
   switch (action.type) {
     case ACTION_TYPE.NEW_MOVE: {
-      const { turn } = state;
-      const { positions } = state;
+      const { turn, positions, movesNotationList } = state;
       const newTurn = turn === "w" ? "b" : "w";
       const newPositions = [...positions, action.payload.newPosition];
+      const newMovesNotationList = [
+        ...movesNotationList,
+        action.payload.moveNotation,
+      ];
       return {
         ...state,
         turn: newTurn,
         positions: newPositions,
+        movesNotationList: newMovesNotationList,
       };
     }
 
@@ -78,6 +82,26 @@ export function reducer(state, action) {
         ...state,
         gameStatus:
           action.payload === "w" ? GameStatus.WHITE_WIN : GameStatus.BLACK_WIN,
+      };
+    }
+
+    case ACTION_TYPE.TAKEBACK: {
+      let { turn, positions, movesNotationList } = state;
+
+      if (positions.length > 1) {
+        positions = positions.slice(0, positions.length - 1);
+        movesNotationList = movesNotationList.slice(
+          0,
+          movesNotationList.length - 1
+        );
+        turn = turn === "w" ? "b" : "w";
+      }
+
+      return {
+        ...state,
+        positions,
+        movesNotationList,
+        turn,
       };
     }
 

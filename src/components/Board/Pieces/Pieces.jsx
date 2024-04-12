@@ -9,20 +9,22 @@ import { openPromotion } from "../../../reducer/actions/popup";
 import { triggerCheckmate, triggerInsufficientMaterial, updateCastling } from "../../../reducer/actions/game";
 import { getCastleDirections } from "../../../referee/getMoves";
 import {triggerStalemate} from "../../../reducer/actions/game"
+import { getMoveNotation } from "../../../helper";
+// import { getPieceColor, getPieceType } from "../../../helper";
+
+function getPieceColor(piece) {
+  return piece[piece.length - 1];
+}
+
+function getPieceType(piece) {
+  return piece.split("_")[0];
+}
 
 const Pieces = () => {
 
   const ref = useRef();
   const {appState, dispatch} = useAppContext();
   const currentPosition = appState.positions[appState.positions.length-1];
-
-  function getPieceType(piece) {
-    return piece.split("_")[0];
-  }
-
-  function getPieceColor(piece){
-    return piece[piece.length-1];
-  }
 
   function calculateCoords(e){
     const {width, left, top} = ref.current.getBoundingClientRect();
@@ -68,7 +70,12 @@ const Pieces = () => {
       }
 
       const newPosition = referee.performMove({position : currentPosition, piece, fromRow, fromCol, toRow, toCol});
-      dispatch(makeNewMove({newPosition}));
+
+      const moveNotation = getMoveNotation({
+        piece, fromRow: Number(fromRow),fromCol: Number(fromCol), toRow, toCol, currentPosition, positionAfterMove: newPosition
+      }); 
+
+      dispatch(makeNewMove({newPosition, moveNotation}));
 
       if(referee.isCheckMate(newPosition, opponent, castleDirection)){
         dispatch(triggerCheckmate(currentPlayer));

@@ -1,3 +1,6 @@
+import { PieceNotation, PieceType } from "./constants";
+import referee from "./referee/referee";
+
 export const getCharacter = (character) => String.fromCharCode(character + 96);
 
 export const getInitPosition = () => {
@@ -50,3 +53,65 @@ export const findPieceCoords = (position, piece) => {
   });
   return result;
 };
+
+export const getMoveNotation = ({
+  piece,
+  fromRow,
+  fromCol,
+  toRow,
+  toCol,
+  currentPosition,
+  promotesTo,
+  positionAfterMove,
+}) => {
+  let notation = "";
+  const pieceType = getPieceType(piece);
+  const pieceColor = getPieceColor(piece);
+
+  //Castling
+  if (pieceType === PieceType.KING && Math.abs(fromCol - toCol) === 2) {
+    if (toCol > fromCol) return "O-O";
+    else return "O-O-O";
+  }
+
+  if (pieceType !== PieceType.PAWN) {
+    notation += getPieceNotation(pieceType);
+
+    if (currentPosition[toRow][toCol] !== "") {
+      notation += PieceNotation.CAPTURE;
+    }
+  } else {
+    if (currentPosition[toRow][toCol] !== "") {
+      notation += getCharacter(fromCol + 1) + PieceNotation.CAPTURE;
+    }
+  }
+
+  notation += getCharacter(toCol + 1) + (toRow + 1);
+
+  if (pieceType === PieceType.PAWN) {
+    const promotionRow = pieceColor === "w" ? 7 : 0;
+    if (toRow === promotionRow) {
+      notation +=
+        PieceNotation.EQUAL + getPieceNotation(getPieceType(promotesTo));
+    }
+  }
+  
+  return notation;
+};
+
+function getPieceColor(piece) {
+  return piece[piece.length - 1];
+}
+
+function getPieceType(piece) {
+  return piece.split("_")[0];
+}
+
+function getPieceNotation(pieceType) {
+  if (pieceType === PieceType.KING) return PieceNotation.KING;
+  if (pieceType === PieceType.BISHOP) return PieceNotation.BISHOP;
+  if (pieceType === PieceType.QUEEN) return PieceNotation.QUEEN;
+  if (pieceType === PieceType.PAWN) return PieceNotation.PAWN;
+  if (pieceType === PieceType.ROOK) return PieceNotation.ROOK;
+  if (pieceType === PieceType.KNIGHT) return PieceNotation.KNIGHT;
+}

@@ -1,0 +1,42 @@
+.moves-list{
+    display: flex;
+    flex-direction: row;
+    color: var(--dark-tile);
+    flex: 1 1;
+    flex-wrap: wrap;
+    align-content: start;
+    overflow: auto;
+    font-size: 1.1em;
+    user-select: none;
+}
+
+.moves-list div{
+    flex-basis: 35%;
+    padding-left: 15%;
+    text-align: left;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.moves-list div[data-number]:nth-child(odd)::before{
+    content: attr(data-number) '.';
+    position: absolute;
+    left: 0;
+    opacity: 0.5;
+}
+
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-tile); /* Color of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--dark-tile); /* Color of the scrollbar handle */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b57464
+}

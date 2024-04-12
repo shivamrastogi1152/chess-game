@@ -30,6 +30,6 @@ export function triggerCheckmate(winner) {
 export function setupNewGame() {
   return {
     type: ACTION_TYPE.NEW_GAME,
-    payload: initGameState,
+    payload: initGameState(),
   };
 }

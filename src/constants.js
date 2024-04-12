@@ -9,6 +9,19 @@ export const PieceType = {
   KING: "king",
 };
 
+export const PieceNotation = {
+  PAWN: "",
+  QUEEN: "Q",
+  ROOK: "R",
+  BISHOP: "B",
+  KNIGHT: "N",
+  KING: "K",
+  CHECK: "+",
+  CHECKMATE: "#",
+  EQUAL: "=",
+  CAPTURE: "x",
+};
+
 export const GameStatus = {
   IN_PROGRESS: "inProgress",
   PAWN_PROMOTION: "pawnPromotion",
@@ -18,8 +31,9 @@ export const GameStatus = {
   INSUFFICIENT_MATERIAL: "Draw by Insufficient material",
 };
 
-export const initGameState = {
+export const initGameState = () => ({
   positions: [getInitPosition()],
+  movesNotationList: [],
   turn: "w",
   candidateMoves: [],
   gameStatus: GameStatus.IN_PROGRESS,
@@ -28,4 +42,4 @@ export const initGameState = {
     w: "Both",
     b: "Both",
   },
-};
+});

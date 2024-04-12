@@ -10,13 +10,5 @@ html, body{
   place-content: center;
   height: 100vh;
   background: var(--bg-color);
+  grid-template-columns: auto calc(3*var(--tile-size) + 20px);
 }
-
-/* button{
-  background: var(--dark-tile);
-  color: var(--light-tile);
-  border: 0 none;
-  padding: 10px 30px;
-  margin: 10px;
-  font-size: 1em;
-} */

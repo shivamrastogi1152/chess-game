@@ -1,9 +1,9 @@
 import { ACTION_TYPE } from "../actionType";
 
-export function makeNewMove({ newPosition }) {
+export function makeNewMove({ newPosition, moveNotation }) {
   return {
     type: ACTION_TYPE.NEW_MOVE,
-    payload: { newPosition },
+    payload: { newPosition, moveNotation },
   };
 }
 
@@ -17,5 +17,11 @@ export function updateCandidateMoves({ candidateMoves }) {
 export function clearCandidateMoves() {
   return {
     type: ACTION_TYPE.CLEAR_CANDIDATE_MOVES,
+  };
+}
+
+export function takeBack() {
+  return {
+    type: ACTION_TYPE.TAKEBACK,
   };
 }

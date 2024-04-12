@@ -1,0 +1,7 @@
+.controls{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: calc(8*var(--tile-size));
+    text-align: center;
+}
